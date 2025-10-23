@@ -44,7 +44,7 @@ class AccountController extends Controller
         $user = User::query()->findOrFail($request->user_id);
 
         if ($user->has('account') && filled($user->account)) {
-            $amount = $user->account->amount;
+            $amount = $request->amount;
             
             if($request->amount > $amount)
             {
