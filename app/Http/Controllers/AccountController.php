@@ -63,6 +63,8 @@ class AccountController extends Controller
 
                 $user->account->amount -= $amount;
                 $user->account->save();
+
+                $balance = $user->account->amount;
             }
         });
 
