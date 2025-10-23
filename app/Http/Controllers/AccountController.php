@@ -73,7 +73,7 @@ class AccountController extends Controller
 
     public function createTransfer(TransferRequest $request)
     {
-        $user = User::query()->findOrFail($request->user_id);
+        $user = User::query()->findOrFail($request->from_user_id);
 
         if ($user->account()->exists() && filled($user->account)) {
             $amount = $request->amount;
@@ -82,7 +82,7 @@ class AccountController extends Controller
                 abort(403, 'не достаточно средств');
             }
 
-            $userAddressee = User::query()->findOrFail($request->user_to_id);
+            $userAddressee = User::query()->findOrFail($request->to_user_id);
 
             if ($userAddressee->account()->exists()) {
                 DB::transaction(function () use ($user, $userAddressee, $amount) {

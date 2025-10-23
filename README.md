@@ -59,3 +59,52 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+## Managment balance api app =)
+Приложение для управления счетами пользователя
+
+## Технологии
+- PHP 8.4
+- Laravel 12
+- mysql
+
+
+
+## api endpoints
+
+### пополнение счета
+```http
+POST api/account/deposit/
+{
+    "user_id": 1,
+    "amount": 200.00,
+    "comment": "Покупка подписки"
+}
+```
+
+### Списание средств
+```http
+POST /api/account/withdraw
+{
+    "user_id": 1,
+    "amount": 200.00,
+    "comment": "Покупка подписки"
+}
+```
+
+### Перевод между пользователями
+```http
+POST /api/account/transfer
+{
+    "from_user_id": 1,
+    "to_user_id": 2,
+    "amount": 150.00,
+    "comment": "Перевод другу"
+}
+```
+
+### Получение баланса
+```http
+GET /api/account/balance/1
+Response: {"user_id": 1, "balance": 350.00}
+```
