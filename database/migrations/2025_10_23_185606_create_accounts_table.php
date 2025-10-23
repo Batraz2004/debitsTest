@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('accounts', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained();
-            $table->decimal('amount');
+            $table->decimal('amount')->unsigned();
             $table->string('comment');
             $table->timestamps();
         });

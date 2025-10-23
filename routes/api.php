@@ -16,7 +16,7 @@ Route::post('login', [LoginController::class, 'login']);
 Route::prefix('account')->middleware('auth:sanctum')->group(function(){
     Route::post('deposit',[AccountController::class,'createDeposit']);
     Route::get('balance/{user_id}',[AccountController::class,'getBalance']);
-    // Route::post('deposit',[AccountController::class]);
+    Route::post('withdraw',[AccountController::class,'withdraw']);
     // Route::post('deposit',[AccountController::class]);
 });
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Account\DepositRequest;
+use App\Http\Requests\Account\WithdrawRequest;
 use App\Models\Account;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -36,5 +37,22 @@ class AccountController extends Controller
             'blance' => $balance,
             'message' => 'пополнение',
         ], 200);
+    }
+
+    public function withdraw(WithdrawRequest $request)
+    {
+        $user = User::query()->findOrFail($request->user_id);
+
+        if ($user->has('account') && filled($user->account)) {
+            $amount = $user->account->amount;
+            
+            if($request->amount > $amount)
+            {
+                abort(403,'не достаточно средств');
+            }
+
+            $user->account->amount -= $amount;
+            $user->account->save();
+        }
     }
 }
