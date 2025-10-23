@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccountController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\RegistrationController;
 use Illuminate\Http\Request;
@@ -11,4 +12,11 @@ Route::get('/user', function (Request $request) {
 
 Route::post('registration', [RegistrationController::class, 'createUser']);
 Route::post('login', [LoginController::class, 'login']);
+
+Route::prefix('account')->middleware('auth:sanctum')->group(function(){
+    Route::post('deposit',[AccountController::class,'createDeposit']);
+    // Route::post('deposit',[AccountController::class]);
+    // Route::post('deposit',[AccountController::class]);
+    // Route::post('deposit',[AccountController::class]);
+});
 
