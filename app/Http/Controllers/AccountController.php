@@ -7,10 +7,7 @@ use App\Http\Requests\Account\TransferRequest;
 use App\Http\Requests\Account\WithdrawRequest;
 use App\Models\Account;
 use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Ramsey\Uuid\Type\Decimal;
 
 class AccountController extends Controller
 {
@@ -54,7 +51,7 @@ class AccountController extends Controller
         $balance = 0;
 
         DB::transaction(function () use ($user, $request, &$balance) {
-            if ($user->has('account') && filled($user->account)) {
+            if ($user->account()->exists() && filled($user->account)) {
                 $amount = $request->amount;
 
                 if ($amount > $user->account->amount) {
