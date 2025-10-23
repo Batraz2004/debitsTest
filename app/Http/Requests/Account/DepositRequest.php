@@ -23,7 +23,7 @@ class DepositRequest extends FormRequest
     {
         return [
             'user_id' => ['required', 'numeric', 'gt:0'],
-            'amount' => ['required'],
+            'amount' => ['required','decimal:2'],
             'comment' => ['required', 'string'],
         ];
     }

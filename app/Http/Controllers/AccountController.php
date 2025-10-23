@@ -12,25 +12,29 @@ class AccountController extends Controller
 {
     public function createDeposit(DepositRequest $request)
     {
-        try {
-            $user = User::query()->firstWhere('id', $request->user_id);
+        $user = User::query()->findOrFail($request->user_id);
 
-            if ($user->has('account') && filled($user->account)) {
-                $user->account->amount += $request->amount;
-                $user->account->save();
-            } else {
-                $deposit = Account::create($request->getData());
-            }
-
-            return response()->json([
-                'data' => $request->getData(),
-                'message' => 'пополнение',
-            ], 200);
-        } catch (\Throwable $th) {
-            return response()->json([
-                'data' => 'произошла ошибка',
-                'error_message' => $th->getMessage(),
-            ], $th->getCode());
+        if ($user->has('account') && filled($user->account)) {
+            $user->account->amount += $request->amount;
+            $user->account->save();
+        } else {
+            $deposit = Account::create($request->getData());
         }
+
+        return response()->json([
+            'blance' => $user->account->amount ?? intval($deposit->amount),
+            'message' => 'пополнение',
+        ], 200);
+    }
+
+    public function getBalance($user_id)
+    {
+        $user = User::query()->with('account')->findOrFail($user_id);
+        $balance = $user->account->amount;
+
+        return response()->json([
+            'blance' => $balance,
+            'message' => 'пополнение',
+        ], 200);
     }
 }
