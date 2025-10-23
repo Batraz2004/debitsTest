@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Account\DepositRequest;
+use App\Http\Requests\Account\TransferRequest;
 use App\Http\Requests\Account\WithdrawRequest;
 use App\Models\Account;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Ramsey\Uuid\Type\Decimal;
 
 class AccountController extends Controller
 {
@@ -15,15 +17,15 @@ class AccountController extends Controller
     {
         $user = User::query()->findOrFail($request->user_id);
 
-        if ($user->has('account') && filled($user->account)) {
+        if ($user->account->exists && filled($user->account)) {
             $user->account->amount += $request->amount;
             $user->account->save();
         } else {
-            $deposit = Account::create($request->getData());
+            $deposit = Account::query()->create($request->getData());
         }
 
         return response()->json([
-            'blance' => $user->account->amount ?? intval($deposit->amount),
+            'blance' => $user->account->amount ?? $deposit->amount,
             'message' => 'пополнение',
         ], 200);
     }
@@ -45,14 +47,49 @@ class AccountController extends Controller
 
         if ($user->has('account') && filled($user->account)) {
             $amount = $request->amount;
-            
-            if($request->amount > $amount)
-            {
-                abort(403,'не достаточно средств');
+
+            if ($request->amount > $amount) {
+                abort(403, 'не достаточно средств');
             }
 
             $user->account->amount -= $amount;
             $user->account->save();
         }
+
+        return response()->json([
+            'blance' => $user->account->amount,
+            'message' => 'снятие средств',
+        ], 200);
+    }
+
+    public function createTransfer(TransferRequest $request)
+    {
+        $user = User::query()->findOrFail($request->user_id);
+
+        if ($user->has('account') && filled($user->account)) {
+            $amount = $request->amount;
+
+            if ($amount > $user->account->amount) {
+                abort(403, 'не достаточно средств');
+            }
+
+            $userAddressee = User::query()->findOrFail($request->user_to_id);
+
+            if ($userAddressee->account()->exists()) {
+                $user->account->amount -= $amount;
+                $user->account->save();
+
+                $userAddressee->account->amount += $amount;
+                $userAddressee->account->save();
+                $message = 'совершен перевод средств';
+            } else
+                $message = 'счет не найден';
+        } else {
+            abort(403, 'не достаточно средств');
+        }
+
+        return response()->json([
+            'messege' => $message
+        ], 200);
     }
 }
