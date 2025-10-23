@@ -57,7 +57,7 @@ class AccountController extends Controller
             if ($user->has('account') && filled($user->account)) {
                 $amount = $request->amount;
 
-                if ($request->amount > $amount) {
+                if ($amount > $user->account->amount) {
                     abort(403, 'не достаточно средств');
                 }
 
