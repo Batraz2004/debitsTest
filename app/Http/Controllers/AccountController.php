@@ -18,8 +18,8 @@ class AccountController extends Controller
         $balance = 0;
 
         DB::transaction(function () use ($user, $request, &$balance) {
+            $amount = $request->amount;
             if ($user->account()->exists() && filled($user->account)) {
-                $amount = $request->amount;
 
                 $user->account->amount += $amount;
                 $user->account->save();
@@ -49,7 +49,7 @@ class AccountController extends Controller
 
         return response()->json([
             'blance' => $balance,
-            'message' => 'пополнение',
+            'message' => 'мои средства',
         ], 200);
     }
 
