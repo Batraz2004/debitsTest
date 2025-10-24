@@ -6,6 +6,7 @@ use App\Http\Requests\Account\DepositRequest;
 use App\Http\Requests\Account\TransferRequest;
 use App\Http\Requests\Account\WithdrawRequest;
 use App\Models\Account;
+use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
@@ -19,6 +20,7 @@ class AccountController extends Controller
         DB::transaction(function () use ($user, $request, &$balance) {
             if ($user->account()->exists() && filled($user->account)) {
                 $amount = $request->amount;
+
                 $user->account->amount += $amount;
                 $user->account->save();
                 $balance = $user->account->amount;
@@ -26,6 +28,12 @@ class AccountController extends Controller
                 $deposit = Account::query()->create($request->getData());
                 $balance = $deposit->amount;
             }
+
+            Transaction::create([
+                    'user_id' => $user->id,
+                    'amount' => $amount,
+                    'status' => 'deposit',
+                ]);
         });
 
         return response()->json([
@@ -62,6 +70,12 @@ class AccountController extends Controller
                 $user->account->save();
 
                 $balance = $user->account->amount;
+
+                Transaction::create([
+                    'user_id' => $user->id,
+                    'amount' => $amount,
+                    'status' => 'withdraw',
+                ]);
             }
         });
 
@@ -91,6 +105,18 @@ class AccountController extends Controller
 
                     $userAddressee->account->amount += $amount;
                     $userAddressee->account->save();
+
+                    Transaction::create([
+                        'user_id' => $user->id,
+                        'amount' => $amount,
+                        'status' => 'transfer_in',
+                    ]);
+
+                    Transaction::create([
+                        'user_id' => $userAddressee->id,
+                        'amount' => $amount,
+                        'status' => 'transfer_out',
+                    ]);
                 });
                 $message = 'совершен перевод средств';
             } else
